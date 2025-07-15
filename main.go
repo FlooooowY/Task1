@@ -34,6 +34,22 @@ func postTasks(c echo.Context) error {
 	tasks = append(tasks, task)
 	return c.JSON(http.StatusCreated, task)
 }
+func patchTasks(c echo.Context) error {
+	id := c.Param("id")
+	var req TaskRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	for i, task := range tasks {
+		if task.ID == id {
+			tasks[i].Name = req.Name
+			return c.JSON(http.StatusOK, tasks[i])
+		}
+	}
+	return c.JSON(http.StatusBadRequest, map[string]string{"error": "Task not found"})
+}
+
 func main() {
 	e := echo.New()
 	e.Use(middleware.CORS())
@@ -41,6 +57,7 @@ func main() {
 
 	e.GET("/tasks", getTasks)
 	e.POST("/tasks", postTasks)
+	e.PATCH("/tasks/:id", patchTasks)
 
 	e.Start("localhost:8080")
 }
