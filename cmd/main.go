@@ -24,7 +24,7 @@ func main() {
 
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
-
+	name := "name"
 	strictHandler := tasks.NewStrictHandler(taskHandlers, nil)
 	tasks.RegisterHandlers(e, strictHandler)
 
