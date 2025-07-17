@@ -12,6 +12,7 @@ type TaskService interface {
 	GetTaskByID(id string) (Task, error)
 	UpdateTask(id string, req TaskRequest) (Task, error)
 	DeleteTask(id string) error
+	GetTaskForUser(userId string) ([]Task, error)
 }
 
 type taskService struct {
@@ -35,8 +36,9 @@ func (s *taskService) CreateTask(req TaskRequest) (Task, error) {
 	}
 
 	task := Task{
-		ID:   uuid.New().String(),
-		Name: req.Name,
+		ID:     uuid.New().String(),
+		Name:   req.Name,
+		UserId: req.UserId,
 	}
 
 	if err := s.repo.CreateTask(task); err != nil {
@@ -67,8 +69,9 @@ func (s *taskService) UpdateTask(id string, req TaskRequest) (Task, error) {
 	}
 
 	task := Task{
-		ID:   id,
-		Name: req.Name,
+		ID:     id,
+		Name:   req.Name,
+		UserId: req.UserId,
 	}
 
 	if err := s.repo.UpdateTask(task); err != nil {
@@ -83,4 +86,8 @@ func (s *taskService) DeleteTask(id string) error {
 		return errors.New("task ID is required")
 	}
 	return s.repo.DeleteTask(id)
+}
+
+func (s *taskService) GetTaskForUser(userId string) ([]Task, error) {
+	return s.repo.GetTaskForUser(userId)
 }

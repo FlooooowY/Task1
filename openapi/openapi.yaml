@@ -185,6 +185,8 @@ components:
           type: string
         name:
           type: string
+        user_id:
+          type: string
     User:
       type: object
       properties:

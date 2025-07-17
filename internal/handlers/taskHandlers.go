@@ -33,8 +33,9 @@ func (h *TaskHandler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject)
 	response := tasks.GetTasks200JSONResponse{}
 	for _, tsk := range allTasks {
 		task := tasks.Task{
-			Id:   &tsk.ID,
-			Name: &tsk.Name,
+			Id:     &tsk.ID,
+			Name:   &tsk.Name,
+			UserId: &tsk.UserId,
 		}
 		response = append(response, task)
 	}
@@ -47,7 +48,8 @@ func (h *TaskHandler) PatchTasksId(_ context.Context, request tasks.PatchTasksId
 	taskRequest := request.Body
 
 	taskToUpdate := taskService.TaskRequest{
-		Name: *taskRequest.Name,
+		Name:   *taskRequest.Name,
+		UserId: *taskRequest.UserId,
 	}
 	updatedTask, err := h.service.UpdateTask(taskID, taskToUpdate)
 	if err != nil {
@@ -55,8 +57,9 @@ func (h *TaskHandler) PatchTasksId(_ context.Context, request tasks.PatchTasksId
 	}
 
 	response := tasks.PatchTasksId200JSONResponse{
-		Id:   &updatedTask.ID,
-		Name: &updatedTask.Name,
+		Id:     &updatedTask.ID,
+		Name:   &updatedTask.Name,
+		UserId: &updatedTask.UserId,
 	}
 
 	return response, nil
@@ -66,7 +69,8 @@ func (h *TaskHandler) PostTasks(_ context.Context, request tasks.PostTasksReques
 
 	taskRequest := request.Body
 	taskToCreate := taskService.TaskRequest{
-		Name: *taskRequest.Name,
+		Name:   *taskRequest.Name,
+		UserId: *taskRequest.UserId,
 	}
 	createdTask, err := h.service.CreateTask(taskToCreate)
 
@@ -75,9 +79,28 @@ func (h *TaskHandler) PostTasks(_ context.Context, request tasks.PostTasksReques
 	}
 
 	response := tasks.PostTasks201JSONResponse{
-		Id:   &createdTask.ID,
-		Name: &createdTask.Name,
+		Id:     &createdTask.ID,
+		Name:   &createdTask.Name,
+		UserId: &createdTask.UserId,
 	}
 
+	return response, nil
+}
+
+func (h *TaskHandler) GetUsersIdTasks(_ context.Context, request tasks.GetUsersIdTasksRequestObject) (tasks.GetUsersIdTasksResponseObject, error) {
+	userId := request.Id
+	taskUser, err := h.service.GetTaskForUser(userId)
+	if err != nil {
+		return nil, err
+	}
+	response := tasks.GetUsersIdTasks200JSONResponse{}
+	for _, task := range taskUser {
+		task := tasks.Task{
+			Id:     &task.ID,
+			Name:   &task.Name,
+			UserId: &task.UserId,
+		}
+		response = append(response, task)
+	}
 	return response, nil
 }
